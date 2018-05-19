@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, '../client')));
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: false}));
 
-mongoose.connect('mongodb://chauq:test123@ds117590.mlab.com:17590/tbwt');
+mongoose.connect('');
 
 
 app.use('/', router);

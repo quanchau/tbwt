@@ -36,8 +36,8 @@ router.route('/insert')
                 port: 465,
                 secure: true,
                 auth: {
-                    user: 'troublemakervn01@gmail.com',
-                    pass: 'junahisbest'
+                    user: '',
+                    pass: ''
                 }
             });
 
