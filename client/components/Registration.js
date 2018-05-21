@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from 'react-bootstrap';
-import {Link} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -108,15 +108,19 @@ class Registration extends React.Component {
 
 
         if (this.state.messageFromServer != '') {
-            {
-                this.state.loading ? (<LoadingSpinner/>) : (<div>
-                    <h3>{this.state.messageFromServer}</h3>
-                    <div><Link to={'/login'}>Back to log in page</Link></div>
-                    );
+            if (this.state.loading) return (<LoadingSpinner/>);
+            else {
+                return (
+                    <div>
+                        <h3>{this.state.messageFromServer}</h3>
+                        <div>
+                            <NavLink to={'/login'}>Back to log in page</NavLink>
+                        </div>
 
-                </div>)
+                    </div>
+                );
+
             }
-
 
         }
 
@@ -136,8 +140,10 @@ class Registration extends React.Component {
             ) : <span/>
 
 
-            {
-                this.state.loading ? (<LoadingSpinner/>) : (
+
+            if (this.state.loading) return (<LoadingSpinner/>);
+            else {
+                return (
                     <div>
                         <br/>
                         <div>
@@ -176,11 +182,14 @@ class Registration extends React.Component {
                             {errorPassword2}
                         </div>
                         <Button bsStyle="success" bsSize="small" onClick={this.onClick}>Sign up</Button>
-
+                        <div>
+                            <NavLink to={"/login"}> Back to log in </NavLink>
+                        </div>
                     </div>
                 );
-
             }
+
+
         }
 
     }

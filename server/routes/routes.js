@@ -118,8 +118,8 @@ router.route('/resend-confirmation')
                     port: 465,
                     secure: true,
                     auth: {
-                        user: 'troublemakervn01@gmail.com',
-                        pass: 'junahisbest'
+                        user: '',
+                        pass: ''
                     }
                 });
 
@@ -145,11 +145,70 @@ router.route('/resend-confirmation')
         });
     });
 
+router.route('/reset-password')
+    .post(function(req,res) {
+        User.findOne({email: req.body.email}, function (err, user) {
+            if (!user) return res.send("There is no account associated with this email address");
+            var token = new Token({_userId: user._id, token: crypto.randomBytes(16).toString('hex')});
+
+            token.save(function (err) {
+                if (err) {
+                    return res.send(err.message)
+                }
 
 
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: '',
+                        pass: ''
+                    }
+                });
 
 
+                let mailOptions = {
+                    from: '"Quan Chau" troublemakervn01@gmail.com', // sender address
+                    to: req.body.email, // list of receivers
+                    subject: 'The Best Way To: Reset your password', // Subject line
+                    text: 'Hi, \n\nPlease click on the link below to reset your password. \nhttp:\/\/' +
+                    req.headers.host + '\/#\/reset-password\/' + token.token
 
+                };
+
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return res.send(error.message);
+                    }
+                    res.send('A password reset link has been sent to ' + req.body.email + '.');
+
+                });
+
+
+            })
+
+        })
+    })
+
+router.route('/reset-password-confirmation')
+    .post(function(req,res) {
+        Token.findOne({
+            token: req.body.token
+        }, function(err, token) {
+            if (!token) return res.send('Link has expired. \nPlease reset your password again to get a new password reset link');
+
+            User.findOne({_id: token._userId}, function (err, user) {
+                if (!user) return res.send('Your account does not exist');
+
+                user.password = req.body.password;
+                user.save(function (err) {
+                    if (err) return res.send(err.message);
+                    res.send("Your new password has been set!");
+                });
+            })
+        })
+    })
 
 
 

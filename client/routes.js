@@ -6,6 +6,10 @@ import ConfirmationPage from './components/ConfirmationPage';
 import NoMatch from './components/NoMatch';
 import Registration from './components/Registration';
 import LoginPage from './components/LoginPage';
+import PasswordReset from './components/PasswordReset';
+import PasswordResetConfirmation from './components/PasswordResetConfirmation';
+
+
 
 export const Routes = () => (
     <Switch>
@@ -13,6 +17,8 @@ export const Routes = () => (
         <Route path='/login' component={LoginPage} />
         <Route path='/registration' component={Registration}/>
         <Route exact path='/confirmation/:token' component={ConfirmationPage} />
+        <Route exact path='/reset-password' component={PasswordReset} />
+        <Route exact path='/reset-password/:token' component={PasswordResetConfirmation} />
         <Route component={NoMatch}/>
     </Switch>
 );

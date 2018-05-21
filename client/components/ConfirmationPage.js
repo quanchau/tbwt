@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import axios from 'axios';
-import {Link} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 
 var querystring = require('querystring');
 
@@ -40,7 +40,7 @@ class ConfirmationPage extends Component {
         return (
             <div>
                 <h2>{this.state.confirmMessage}</h2>
-                <Link to={"/login"}>Back to log in</Link>
+                <NavLink to={"/login"}>Back to log in</NavLink>
             </div>
         )
     }
