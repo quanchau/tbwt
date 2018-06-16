@@ -8,7 +8,7 @@ import Registration from './components/Registration';
 import LoginPage from './components/LoginPage';
 import PasswordReset from './components/PasswordReset';
 import PasswordResetConfirmation from './components/PasswordResetConfirmation';
-
+import PostQuestion from './components/PostQuestion';
 
 
 export const Routes = () => (
@@ -19,6 +19,7 @@ export const Routes = () => (
         <Route exact path='/confirmation/:token' component={ConfirmationPage} />
         <Route exact path='/reset-password' component={PasswordReset} />
         <Route exact path='/reset-password/:token' component={PasswordResetConfirmation} />
+        <Route exact path='/post-question' component={PostQuestion} />
         <Route component={NoMatch}/>
     </Switch>
 );

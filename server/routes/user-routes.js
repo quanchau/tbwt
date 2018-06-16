@@ -1,4 +1,6 @@
-//server/routes/routes.js
+import {email, password} from '../../keys';
+
+//server/routes/user-routes.js
 var express = require('express');
 var bodyParser = require('body-parser');
 var nodemailer = require("nodemailer");
@@ -6,6 +8,7 @@ var User = require('../../models/User');
 var Token = require('../../models/Token');
 var router = express.Router();
 var crypto = require('crypto');
+var bcrypt = require('bcrypt');
 
 
 router.get('/', function(req, res){
@@ -17,50 +20,52 @@ router.route('/insert')
 
         var user = new User();
         user.email = req.body.email;
-        user.password = req.body.password;
-
-
-        user.save(function(err) {
-           if (err) {
-               console.log("error before mail");
-               return res.send("Email Error");
-           }
-
-           var token = new Token({_userId: user._id, token: crypto.randomBytes(16).toString('hex')});
-
-           token.save(function(err) {
-               if (err) {return res.send(err.message)};
-
-            let transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: '',
-                    pass: ''
+        bcrypt.hash( req.body.password, 10, function(err, hash) {
+            user.password = hash;
+            user.save(function(err) {
+                if (err) {
+                    console.log("error before mail");
+                    return res.send("Email Error");
                 }
+
+                var token = new Token({_userId: user._id, token: crypto.randomBytes(16).toString('hex')});
+
+                token.save(function(err) {
+                    if (err) {return res.send(err.message)};
+
+                    let transporter = nodemailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        port: 465,
+                        secure: true,
+                        auth: {
+                            user: email,
+                            pass: password
+                        }
+                    });
+
+
+                    let mailOptions = {
+                        from: '"Quan Chau" troublemakervn01@gmail.com', // sender address
+                        to: req.body.email, // list of receivers
+                        subject: 'The Best Way To: Comfirm your email address', // Subject line
+                        text: 'Hi, \n\n Thank you for joining The Best Way To. Please click on the link below to verify your email. \nhttp:\/\/' +
+                        req.headers.host + '\/#\/confirmation\/' + token.token
+
+                    };
+
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log("error when mailing");
+                            return  res.send(error.message);
+                        }
+                        res.send('A verification email has been sent to ' + req.body.email + '.');
+
+                    });
+                });
             });
-
-
-            let mailOptions = {
-                from: '"Quan Chau" troublemakervn01@gmail.com', // sender address
-                to: req.body.email, // list of receivers
-                subject: 'The Best Way To: Comfirm your email address', // Subject line
-                text: 'Hi, \n\n Thank you for joining The Best Way To. Please click on the link below to verify your email. \nhttp:\/\/' +
-                req.headers.host + '\/#\/confirmation\/' + token.token
-
-            };
-
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.log("error when mailing");
-                   return  res.send(error.message);
-                }
-                res.send('A verification email has been sent to ' + req.body.email + '.');
-
-            });
-           });
         });
+
+
     });
 
 
@@ -89,13 +94,18 @@ router.route('/confirmation')
 router.route('/login')
     .post(function(req, res, next) {
        User.findOne({
-           email: req.body.email,
-           password: req.body.password,
+           email: req.body.email
        }, function(err, user) {
-           if (!user) return res.send("Credentials are invalid");
-           if (!user.isVerified) return res.send("VERIFY");
+           if (!user) return res.send({message: "Credentials are invalid"});
+           if (!user.isVerified) return res.send({message: "VERIFY"});
+           bcrypt.compare(req.body.password, user.password, function(err, doesMatch) {
+               if (doesMatch) {
+                   return res.send({message: "DONE", id: user._id});
+               } else {
+                   return res.send({message: "Credentials are invalid"});
+               }
+           });
 
-           res.send("DONE");
        })
     });
 
@@ -118,8 +128,8 @@ router.route('/resend-confirmation')
                     port: 465,
                     secure: true,
                     auth: {
-                        user: '',
-                        pass: ''
+                        user: email,
+                        pass: password
                     }
                 });
 
@@ -162,8 +172,8 @@ router.route('/reset-password')
                     port: 465,
                     secure: true,
                     auth: {
-                        user: '',
-                        pass: ''
+                        user: email,
+                        pass: password
                     }
                 });
 
@@ -201,10 +211,12 @@ router.route('/reset-password-confirmation')
             User.findOne({_id: token._userId}, function (err, user) {
                 if (!user) return res.send('Your account does not exist');
 
-                user.password = req.body.password;
-                user.save(function (err) {
-                    if (err) return res.send(err.message);
-                    res.send("Your new password has been set!");
+                bcrypt.hash( req.body.password, 10, function(err, hash) {
+                    user.password = hash;
+                    user.save(function (err) {
+                        if (err) return res.send(err.message);
+                        res.send("Your new password has been set!");
+                    });
                 });
             })
         })

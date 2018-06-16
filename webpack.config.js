@@ -9,11 +9,12 @@ module.exports = {
     },
     module: {
         loaders: [{
-            test: /.jsx?$/,
+            test: /.js$/,
             loader: 'babel-loader',
             exclude: /node_modules/,
             query: {
-                presets: ['es2015', 'react']
+                presets: ['es2015', 'react','react-hmre'],
+                plugins: ['transform-class-properties']
             }
         },
             {

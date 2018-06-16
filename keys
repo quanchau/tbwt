@@ -1,0 +1,3 @@
+export const mongodbKey= 'mongodb://chauq:test123@ds117590.mlab.com:17590/tbwt';
+export const email = "troublemakervn01@gmail.com";
+export const password = "junahisbest";

@@ -52,17 +52,17 @@ class ConnectedLoginPage extends Component {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
             }).then(function(response) {
-            if (response.data == "DONE") {
-                console.log("ABC");
+            if (response.data.message == "DONE") {
+
                 const email = e.state.email;
-                const password = e.state.password;
-                localStorage.setItem("user", JSON.stringify({email, password}));
+                const id = response.data.id;
+                localStorage.setItem("user", JSON.stringify({email, id}));
                 e.props.history.push('/');
 
 
             }
 
-            else if (response.data == 'VERIFY') {
+            else if (response.data.message == 'VERIFY') {
                 e.setState({
                     needConfirmation: true,
                     messageFromServer: '',
@@ -72,7 +72,7 @@ class ConnectedLoginPage extends Component {
 
             else {
                 e.setState({
-                    messageFromServer: response.data,
+                    messageFromServer: response.data.message,
                     needConfirmation: false,
 
                 });
@@ -101,7 +101,7 @@ class ConnectedLoginPage extends Component {
             e.setState({
                 loading: false,
 
-                messageFromServer: response.data,
+                messageFromServer: response.data.message,
 
             });
 
@@ -126,22 +126,22 @@ class ConnectedLoginPage extends Component {
 
 
             const confirmationMessage = this.state.needConfirmation ? (
-                <div>Email address not confirmed. Click <button onClick={this.onClickResend}><b>here</b></button> to
+                <div className={"confirmation-message"}>Email address not confirmed. Click <button onClick={this.onClickResend}><b>here</b></button> to
                     receive a new confirmation link</div>
             ) : <span/>;
 
             const loadingDisplay = this.state.loading? <LoadingSpinner />: <span/>;
 
             const errorMessage = this.state.messageFromServer != '' ?
-                (<div>{this.state.messageFromServer}</div>) : <span/>;
+                (<div className={"error-message"}>{this.state.messageFromServer}</div>) : <span/>;
 
 
             return (
-                <div>
+                <div className={"login-page"}>
                     {confirmationMessage}
                     {loadingDisplay}
                     {errorMessage}
-                    <div>
+                    <div className={"email-input"}>
                         <label htmlFor={"email"}>Email:</label>
                         <input
                             type={"email"}
@@ -151,7 +151,7 @@ class ConnectedLoginPage extends Component {
                             onKeyPress={this.onKeyDown}
                             onChange={this.handleTextChange}/>
                     </div>
-                    <div>
+                    <div className={"password-input"}>
                         <label htmlFor={"password"}>Password:</label>
                         <input
                             type={"password"}
@@ -162,12 +162,12 @@ class ConnectedLoginPage extends Component {
                             onKeyPress={this.onKeyDown}/>
                     </div>
 
-                    <Button type="submit" bsStyle="success" bsSize="small" onClick={this.onClick}> Log in </Button>
-                    <div>
+                    <Button type="submit" bsStyle="success" bsSize="small" onClick={this.onClick} className={"login-button"}> Log in </Button>
+                    <div className={"create-account"}>
 
                         <NavLink to={"/registration"}> Create a new account </NavLink>
                     </div>
-                    <div>
+                    <div className={"reset-password"}>
                         <NavLink to={"/reset-password"}> Forgot your password? </NavLink>
                     </div>
                 </div>
